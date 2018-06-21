@@ -36,7 +36,7 @@ func Boot() {
 				Jar:     jar,
 			}
 			if appleIDs[x].Check() {
-				appleIDs[x].Unlock()
+				CheckErr(appleIDs[x].Unlock())
 			}
 		})
 	}
