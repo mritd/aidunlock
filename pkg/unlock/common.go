@@ -2,11 +2,13 @@ package unlock
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
 	"os/user"
 	"strings"
+	"time"
 )
 
 const (
@@ -105,6 +107,7 @@ func ExampleConfig() []*AppleID {
 		},
 	}
 }
+
 func CheckRoot() {
 	u, err := user.Current()
 	CheckAndExit(err)
@@ -113,4 +116,13 @@ func CheckRoot() {
 		log.Println("This command must be run as root! (sudo)")
 		os.Exit(1)
 	}
+}
+
+func RandStr(len int) string {
+	rand.Seed(time.Now().UnixNano())
+	data := make([]byte, len)
+	for i := 0; i < len; i++ {
+		data[i] = byte(rand.Intn(26) + 97)
+	}
+	return string(data)
 }

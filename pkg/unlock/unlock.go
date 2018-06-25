@@ -62,14 +62,15 @@ func (appID AppleID) Unlock() error {
 		return err
 	}
 
-	sstt, location, err = appID.UnlockAppleID(sstt, location)
-	if err != nil {
-		return err
-	}
+	if strings.HasPrefix(location, "/password/reset") {
+		return appID.RestPassword(sstt, location)
+	} else {
+		sstt, location, err = appID.UnlockAppleID(sstt, location)
+		if err != nil {
+			return err
+		}
 
-	err = appID.ValidatePassword(sstt, location)
-	if err != nil {
-		return err
+		return appID.ValidatePassword(sstt, location)
 	}
 
 	return nil
@@ -374,6 +375,64 @@ func (appID AppleID) UnlockAppleID(sstt, location string) (string, string, error
 	sstt = resp.Header.Get("sstt")
 	location = resp.Header.Get("Location")
 	return sstt, location, nil
+}
+
+func (appID AppleID) RestPassword(sstt, location string) error {
+	log.Println("Reset AppleID Password")
+
+	// get sstt
+	req, err := http.NewRequest("GET", BaseURL+location, nil)
+	if !CheckErr(err) {
+		return err
+	}
+
+	setCommonHeader(req, JSON, sstt)
+
+	// request
+	resp, err := appID.Client.Do(req)
+	if !CheckErr(err) {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("Reset AppleID Failed ")
+	}
+
+	// get sstt
+	sstt = resp.Header.Get("sstt")
+	password := RandStr(16)
+
+	log.Printf("Reset Password: %s\n", password)
+
+	// unlock
+	req, err = http.NewRequest("POST", BaseURL+"/password/reset", bytes.NewBufferString(`{"password":"`+password+`"}`))
+	if !CheckErr(err) {
+		return err
+	}
+
+	setCommonHeader(req, JSON, "")
+	req.Header.Set("sstt", sstt)
+
+	// request
+	resp, err = appID.Client.Do(req)
+	if !CheckErr(err) {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 260 {
+		return errors.New("Reset Password Failed ")
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if !CheckErr(err) {
+		return err
+	}
+	if jsoniter.Get(b, "unlockCompleted").ToBool() {
+		log.Printf("Unlock Apple ID [%s] success\n", appID.ID)
+	}
+	return nil
 }
 
 func (appID AppleID) ValidatePassword(sstt, location string) error {
