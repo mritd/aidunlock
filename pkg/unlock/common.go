@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/user"
 	"strings"
-	"time"
 )
 
 const (
@@ -44,6 +43,8 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target`
+
+var letters = []rune("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
 func setCommonHeader(req *http.Request, accept, sstt string) {
 
@@ -118,11 +119,12 @@ func CheckRoot() {
 	}
 }
 
-func RandStr(len int) string {
-	rand.Seed(time.Now().UnixNano())
-	data := make([]byte, len)
-	for i := 0; i < len; i++ {
-		data[i] = byte(rand.Intn(26) + 97)
+
+
+func RandStr(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
 	}
-	return string(data)
+	return string(b)
 }

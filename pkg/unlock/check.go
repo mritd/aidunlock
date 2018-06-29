@@ -8,7 +8,7 @@ import (
 )
 
 func (appID AppleID) Check() bool {
-	log.Printf("Validate AppID ==> %s\n", appID.ID)
+	log.Printf("Check AppID ==> %s\n", appID.ID)
 
 	// create request
 	req, err := http.NewRequest("POST", BaseURL+"/password/verify/appleid", bytes.NewBufferString(`{"id":"`+appID.ID+`"}`))
