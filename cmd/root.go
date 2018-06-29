@@ -64,6 +64,7 @@ func initConfig() {
 		if _, err := os.Stat(cfgFile); err != nil {
 			os.Create(cfgFile)
 			viper.Set("AppleIDs", unlock.ExampleConfig())
+			viper.Set("Email", unlock.SMTPExampleConfig())
 			viper.WriteConfig()
 		}
 

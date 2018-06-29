@@ -119,8 +119,6 @@ func CheckRoot() {
 	}
 }
 
-
-
 func RandStr(n int) string {
 	b := make([]rune, n)
 	for i := range b {

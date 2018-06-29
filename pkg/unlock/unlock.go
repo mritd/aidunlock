@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/json-iterator/go"
+	"github.com/spf13/viper"
 )
 
 type AppleID struct {
@@ -423,6 +424,10 @@ func (appID AppleID) RestPassword(sstt, location string) error {
 
 	if resp.StatusCode != 260 {
 		return errors.New("Reset Password Failed ")
+	} else {
+		var smtp SMTPConfig
+		viper.UnmarshalKey("email", &smtp)
+		smtp.Send(fmt.Sprintf("Apple ID [%s] Password Reset Success!\nNew Password: %s\n", appID.ID, password))
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
