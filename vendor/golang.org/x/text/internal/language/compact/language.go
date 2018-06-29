@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE file.
 
 //go:generate go run gen.go gen_index.go -output tables.go
-//go:generate go run gen_parents.go
 
 package compact
 
@@ -20,7 +19,6 @@ import (
 // specific language or locale. All language tag values are guaranteed to be
 // well-formed.
 type Tag struct {
-	// NOTE: exported tags will become part of the public API.
 	language ID
 	locale   ID
 	full     fullTag // always a language.Tag for now.
@@ -136,6 +134,9 @@ func nextToken(s string) (t, tail string) {
 func LanguageID(t Tag) (id ID, exact bool) {
 	return t.language, t.full == nil
 }
+
+// TODO: make these functions and methods public once we settle on the API and
+//
 
 // RegionalID returns the ID for the regional variant of this tag. This index is
 // used to indicate region-specific overrides, such as default currency, default
