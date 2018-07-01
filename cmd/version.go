@@ -22,57 +22,20 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/mritd/aidunlock/pkg/unlock"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-const version = "1.0.0"
-
-var cfgFile string
-
-var rootCmd = &cobra.Command{
-	Use:   "aidunlock",
-	Short: "A simple Apple ID unlock tool.",
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print version",
 	Long: `
-A simple Apple ID unlock tool.`,
+Print version.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		unlock.Boot()
+		fmt.Printf("Version: %s\n", version)
 	},
 }
 
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
 func init() {
-	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is aidunlock.yaml)")
-}
-
-func initConfig() {
-
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		cfgFile = "aidunlock.yaml"
-		viper.SetConfigFile(cfgFile)
-
-		if _, err := os.Stat(cfgFile); err != nil {
-			os.Create(cfgFile)
-			viper.Set("AppleIDs", unlock.ExampleConfig())
-			viper.Set("Email", unlock.SMTPExampleConfig())
-			viper.WriteConfig()
-		}
-
-	}
-
-	viper.AutomaticEnv()
-	viper.ReadInConfig()
-
+	rootCmd.AddCommand(versionCmd)
 }

@@ -17,10 +17,10 @@ func Install() {
 
 	if runtime.GOOS == "linux" {
 
-		log.Println("Create config dir /etc/aidunlock")
-		os.MkdirAll("/etc/aidunlock", 0755)
+		log.Printf("Create config dir %s\n", configDir)
+		os.MkdirAll(configDir, 0755)
 
-		log.Println("Copy file to /usr/bin")
+		log.Printf("Copy file to %s\n", binPath)
 		currentPath, err := exec.LookPath(os.Args[0])
 		CheckAndExit(err)
 
@@ -28,22 +28,22 @@ func Install() {
 		CheckAndExit(err)
 		defer currentFile.Close()
 
-		installFile, err := os.OpenFile("/usr/bin/aidunlock", os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0755)
+		installFile, err := os.OpenFile(binPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0755)
 		CheckAndExit(err)
 		defer installFile.Close()
 		_, err = io.Copy(installFile, currentFile)
 		CheckAndExit(err)
 
-		log.Println("Create config file /etc/aidunlock/config.yaml")
-		configFile, err := os.Create("/etc/aidunlock/config.yaml")
+		log.Printf("Create config file %s\n", configFilePath)
+		configFile, err := os.Create(configFilePath)
 		CheckAndExit(err)
 		defer configFile.Close()
-		viper.SetConfigFile("/etc/aidunlock/config.yaml")
+		viper.SetConfigFile(configFilePath)
 		viper.Set("AppleIDs", ExampleConfig())
 		CheckAndExit(viper.WriteConfig())
 
-		log.Println("Create systemd config file /lib/systemd/system/aidunlock.service")
-		systemdServiceFile, err := os.Create("/lib/systemd/system/aidunlock.service")
+		log.Printf("Create systemd config file %s\n", servicePath)
+		systemdServiceFile, err := os.Create(servicePath)
 		CheckAndExit(err)
 		defer systemdServiceFile.Close()
 		fmt.Fprint(systemdServiceFile, SystemdConfig)

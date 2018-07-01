@@ -11,28 +11,34 @@ import (
 )
 
 type SMTPConfig struct {
-	Username string `yml:"username"`
-	Password string `yml:"password"`
-	From     string `yml:"from"`
-	To       string `yml:"to"`
-	Server   string `yml:"Server"`
+	UserName string   `yml:"username"`
+	Password string   `yml:"password"`
+	From     string   `yml:"from"`
+	To       []string `yml:"to"`
+	Server   string   `yml:"Server"`
 }
 
 func SMTPExampleConfig() *SMTPConfig {
 	return &SMTPConfig{
-		Username: "mritd",
+		UserName: "mritd",
 		Password: "password",
 		From:     "mritd@mritd.me",
-		To:       "mritd1234@gmail.com",
-		Server:   "smtp.qq.com:25",
+		To: []string{
+			"mritd@mritd.me",
+			"mritd1234@gmail.com",
+		},
+		Server: "smtp.qq.com:25",
 	}
 }
 
 func (cfg *SMTPConfig) Send(message string) {
-	err := cfg.sendEmail(cfg.To, message)
-	if err != nil {
-		log.Printf("Email alarm send failed: %s\n", cfg.To)
+	for _, t := range cfg.To {
+		err := cfg.sendEmail(t, message)
+		if err != nil {
+			log.Printf("Email send failed: %s\n", cfg.To)
+		}
 	}
+
 }
 
 // dial using TLS/SSL
@@ -96,14 +102,14 @@ func (cfg *SMTPConfig) sendEmail(toAddr string, body string) (err error) {
 		return
 	}
 	// Set up authentication information.
-	auth := smtp.PlainAuth("", cfg.Username, cfg.Password, host)
+	auth := smtp.PlainAuth("", cfg.UserName, cfg.Password, host)
 	// auth the smtp client
 	err = smtpClient.Auth(auth)
 	if err != nil {
 		return
 	}
 	// set To && From address, note that from address must be same as authorization user.
-	from := mail.Address{Address: cfg.Username}
+	from := mail.Address{Address: cfg.UserName}
 	to := mail.Address{Address: toAddr}
 	err = smtpClient.Mail(from.Address)
 	if err != nil {
