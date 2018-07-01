@@ -403,6 +403,7 @@ func (appID AppleID) RestPassword(sstt, location string) error {
 	// get sstt
 	sstt = resp.Header.Get("sstt")
 	password := RandStr(16)
+	appID.Password = password
 
 	log.Printf("Reset Password: %s\n", password)
 
@@ -428,6 +429,7 @@ func (appID AppleID) RestPassword(sstt, location string) error {
 		var smtp SMTPConfig
 		viper.UnmarshalKey("email", &smtp)
 		smtp.Send(fmt.Sprintf("Apple ID [%s] Password Reset Success!\nNew Password: %s\n", appID.ID, password))
+		// TODO: update config
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
