@@ -27,6 +27,13 @@ const (
 	HTML = "HTML"
 )
 
+const (
+	binPath        = "/usr/bin/aidunlock"
+	configDir      = "/etc/aidunlock"
+	configFilePath = configDir + "/config.yaml"
+	servicePath    = "/lib/systemd/system/aidunlock.service"
+)
+
 const SystemdConfig = `[Unit]
 Description=AppleID Unlock
 Documentation=https://github.com/mritd/aidunlock

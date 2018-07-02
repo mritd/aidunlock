@@ -16,9 +16,9 @@ func Uninstall() {
 		exec.Command("systemctl", "stop", "aidunlock").Run()
 
 		log.Println("Clean files")
-		os.Remove("/usr/bin/aidunlock")
-		os.Remove("/etc/aidunlock")
-		os.Remove("/lib/systemd/system/aidunlock.service")
+		os.Remove(binPath)
+		os.Remove(configDir)
+		os.Remove(servicePath)
 
 		log.Println("Systemd reload")
 		exec.Command("systemctl", "daemon-reload").Run()
