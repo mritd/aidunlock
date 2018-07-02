@@ -1,4 +1,4 @@
-// Copyright 2018 The Go Authors. All rights reserved.
+// Copyright 2015 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,8 +10,7 @@ import (
 	"log"
 
 	"golang.org/x/text/internal/gen"
-	"golang.org/x/text/internal/language"
-	"golang.org/x/text/internal/language/compact"
+	"golang.org/x/text/language"
 	"golang.org/x/text/unicode/cldr"
 )
 
@@ -26,29 +25,28 @@ func main() {
 	}
 
 	w := gen.NewCodeWriter()
-	defer w.WriteGoFile("parents.go", "compact")
+	defer w.WriteGoFile("tables.go", "internal")
 
 	// Create parents table.
-	type ID uint16
-	parents := make([]ID, compact.NumCompactTags)
+	parents := make([]uint16, language.NumCompactTags)
 	for _, loc := range data.Locales() {
 		tag := language.MustParse(loc)
-		index, ok := compact.FromTag(tag)
+		index, ok := language.CompactIndex(tag)
 		if !ok {
 			continue
 		}
-		parentIndex := compact.ID(0) // und
+		parentIndex := 0 // und
 		for p := tag.Parent(); p != language.Und; p = p.Parent() {
-			if x, ok := compact.FromTag(p); ok {
+			if x, ok := language.CompactIndex(p); ok {
 				parentIndex = x
 				break
 			}
 		}
-		parents[index] = ID(parentIndex)
+		parents[index] = uint16(parentIndex)
 	}
 
 	w.WriteComment(`
-	parents maps a compact index of a tag to the compact index of the parent of
+	Parent maps a compact index of a tag to the compact index of the parent of
 	this tag.`)
-	w.WriteVar("parents", parents)
+	w.WriteVar("Parent", parents)
 }
