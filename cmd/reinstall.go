@@ -21,7 +21,7 @@
 package cmd
 
 import (
-	"github.com/mritd/aidunlock/pkg/unlock"
+	"github.com/mritd/aidunlock/unlock"
 	"github.com/spf13/cobra"
 )
 

@@ -24,12 +24,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mritd/aidunlock/pkg/unlock"
+	"github.com/mritd/aidunlock/unlock"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-const version = "1.0.1"
+const version = "1.0.2"
 
 var cfgFile string
 
