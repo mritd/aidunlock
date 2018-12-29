@@ -33,7 +33,7 @@ func SMTPExampleConfig() *SMTPConfig {
 
 func (cfg *SMTPConfig) Send(message string) {
 	for _, t := range cfg.To {
-		log.Printf("Send new password to %s\n", t)
+		log.Printf("Send email to %s\n", t)
 		err := cfg.sendEmail(t, message)
 		if err != nil {
 			log.Printf("Email send failed: %s\n", t)
