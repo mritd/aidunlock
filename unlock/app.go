@@ -1,6 +1,7 @@
 package unlock
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -36,7 +37,12 @@ func Boot() {
 				Jar:     jar,
 			}
 			if appleIDs[x].Check() {
-				CheckErr(appleIDs[x].Unlock())
+				err := appleIDs[x].Unlock()
+				if err != nil {
+					var smtp SMTPConfig
+					_ = viper.UnmarshalKey("email", &smtp)
+					smtp.Send(fmt.Sprintf("Apple ID [%s] unlock failed: %s\n", appleIDs[x].ID, err.Error()))
+				}
 			}
 		})
 	}

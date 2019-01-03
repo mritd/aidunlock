@@ -63,19 +63,12 @@ func (appID AppleID) Unlock() error {
 		return err
 	}
 
-	if strings.HasPrefix(location, "/password/reset") {
-		var smtp SMTPConfig
-		_ = viper.UnmarshalKey("email", &smtp)
-		smtp.Send(fmt.Sprintf("Apple ID [%s] Need Reset Password!\n", appID.ID))
-		return errors.New(fmt.Sprintf("Apple ID [%s] Need Reset Password!\n", appID.ID))
-	} else {
-		sstt, location, err = appID.UnlockAppleID(sstt, location)
-		if err != nil {
-			return err
-		}
-
-		return appID.ValidatePassword(sstt, location)
+	sstt, location, err = appID.UnlockAppleID(sstt, location)
+	if err != nil {
+		return err
 	}
+
+	return appID.ValidatePassword(sstt, location)
 
 }
 
