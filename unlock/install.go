@@ -3,10 +3,11 @@ package unlock
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/spf13/viper"
 )
@@ -17,10 +18,10 @@ func Install() {
 
 	if runtime.GOOS == "linux" {
 
-		log.Printf("Create config dir %s\n", configDir)
+		logrus.Printf("Create config dir %s\n", configDir)
 		_ = os.MkdirAll(configDir, 0755)
 
-		log.Printf("Copy file to %s\n", binPath)
+		logrus.Printf("Copy file to %s\n", binPath)
 		currentPath, err := exec.LookPath(os.Args[0])
 		CheckAndExit(err)
 
@@ -38,7 +39,7 @@ func Install() {
 		_, err = io.Copy(installFile, currentFile)
 		CheckAndExit(err)
 
-		log.Printf("Create config file %s\n", configFilePath)
+		logrus.Printf("Create config file %s\n", configFilePath)
 		configFile, err := os.Create(configFilePath)
 		CheckAndExit(err)
 		defer func() {
@@ -48,7 +49,7 @@ func Install() {
 		viper.Set("AppleIDs", ExampleConfig())
 		CheckAndExit(viper.WriteConfig())
 
-		log.Printf("Create systemd config file %s\n", servicePath)
+		logrus.Printf("Create systemd config file %s\n", servicePath)
 		systemdServiceFile, err := os.Create(servicePath)
 		CheckAndExit(err)
 		defer func() {
@@ -57,6 +58,6 @@ func Install() {
 		_, _ = fmt.Fprint(systemdServiceFile, SystemdConfig)
 
 	} else {
-		log.Println("Install not support this platform!")
+		logrus.Print("Install not support this platform!")
 	}
 }

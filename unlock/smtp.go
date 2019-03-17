@@ -3,9 +3,10 @@ package unlock
 import (
 	"net/smtp"
 
+	"github.com/sirupsen/logrus"
+
 	"crypto/tls"
 	"fmt"
-	"log"
 	"net"
 	"net/mail"
 )
@@ -33,10 +34,10 @@ func SMTPExampleConfig() *SMTPConfig {
 
 func (cfg *SMTPConfig) Send(message string) {
 	for _, t := range cfg.To {
-		log.Printf("Send email to %s\n", t)
+		logrus.Printf("Send email to %s\n", t)
 		err := cfg.sendEmail(t, message)
 		if err != nil {
-			log.Printf("Email send failed: %s\n", t)
+			logrus.Printf("Email send failed: %s\n", t)
 		}
 	}
 

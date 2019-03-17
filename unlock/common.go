@@ -1,7 +1,7 @@
 package unlock
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -79,7 +79,7 @@ func setCommonHeader(req *http.Request, accept, sstt string) {
 
 func CheckErr(err error) bool {
 	if err != nil {
-		log.Println(err)
+		logrus.Print(err)
 		return false
 	}
 	return true
@@ -121,7 +121,7 @@ func CheckRoot() {
 	CheckAndExit(err)
 
 	if u.Uid != "0" || u.Gid != "0" {
-		log.Println("This command must be run as root! (sudo)")
+		logrus.Print("This command must be run as root! (sudo)")
 		os.Exit(1)
 	}
 }

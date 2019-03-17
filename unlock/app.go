@@ -2,10 +2,11 @@ package unlock
 
 import (
 	"fmt"
-	"log"
+	"net/http/cookiejar"
 	"os"
 
-	"net/http/cookiejar"
+	"github.com/patrickmn/go-cache"
+	"github.com/sirupsen/logrus"
 
 	"net/http"
 	"time"
@@ -14,11 +15,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+var idCache *cache.Cache
+
 func Boot() {
 	var appleIDs []AppleID
 	err := viper.UnmarshalKey("AppleIDs", &appleIDs)
 	if err != nil {
-		log.Println("Can't parse server config!")
+		logrus.Print("Can't parse server config!")
 		os.Exit(1)
 	}
 
@@ -26,7 +29,7 @@ func Boot() {
 	for i := range appleIDs {
 		x := i
 
-		log.Printf("Apple ID [%s] cron starting\n", appleIDs[x].ID)
+		logrus.Printf("Apple ID [%s] cron starting\n", appleIDs[x].ID)
 
 		_ = c.AddFunc(appleIDs[x].Cron, func() {
 
@@ -37,8 +40,22 @@ func Boot() {
 				Jar:     jar,
 			}
 			if appleIDs[x].Check() {
+
+				// unlock failed count
+				var idFailedCount int
+				failedCount, ok := idCache.Get(appleIDs[x].ID)
+				if ok {
+					idFailedCount = failedCount.(int)
+				}
+				// no more trying to unlock more than 2 times
+				if idFailedCount > 1 {
+					logrus.Warnf("Apple ID [%s] failed to unlock twice", appleIDs[x].ID)
+					return
+				}
+
 				err := appleIDs[x].Unlock()
 				if err != nil {
+					idCache.Set(appleIDs[x].ID, idFailedCount+1, cache.NoExpiration)
 					var smtp SMTPConfig
 					_ = viper.UnmarshalKey("email", &smtp)
 					smtp.Send(fmt.Sprintf("Apple ID [%s] unlock failed: %s\n", appleIDs[x].ID, err.Error()))
@@ -48,4 +65,8 @@ func Boot() {
 	}
 	c.Start()
 	select {}
+}
+
+func init() {
+	idCache = cache.New(cache.NoExpiration, cache.NoExpiration)
 }

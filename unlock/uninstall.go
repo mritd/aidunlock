@@ -1,10 +1,11 @@
 package unlock
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/sirupsen/logrus"
 )
 
 func Uninstall() {
@@ -12,18 +13,18 @@ func Uninstall() {
 	if runtime.GOOS == "linux" {
 		CheckRoot()
 
-		log.Println("Stop AppleID Unlock")
+		logrus.Print("Stop AppleID Unlock")
 		_ = exec.Command("systemctl", "stop", "aidunlock").Run()
 
-		log.Println("Clean files")
+		logrus.Print("Clean files")
 		_ = os.Remove(binPath)
 		_ = os.Remove(configDir)
 		_ = os.Remove(servicePath)
 
-		log.Println("Systemd reload")
+		logrus.Print("Systemd reload")
 		_ = exec.Command("systemctl", "daemon-reload").Run()
 	} else {
-		log.Println("Uninstall not support this platform!")
+		logrus.Print("Uninstall not support this platform!")
 	}
 
 }

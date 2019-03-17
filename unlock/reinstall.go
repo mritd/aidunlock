@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"runtime"
+
+	"github.com/sirupsen/logrus"
 )
 
 func Reinstall() {
@@ -13,7 +15,7 @@ func Reinstall() {
 
 		configExist := false
 
-		log.Println("Backup config")
+		logrus.Print("Backup config")
 		// check config
 		if _, err := os.Stat(configFilePath); err == nil {
 			f, err := os.Open(configFilePath)
@@ -44,7 +46,7 @@ func Reinstall() {
 
 		if configExist {
 
-			log.Println("Restore config")
+			logrus.Print("Restore config")
 
 			f, err := os.OpenFile(configFilePath, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 			if err != nil {
@@ -69,7 +71,7 @@ func Reinstall() {
 		}
 
 	} else {
-		log.Println("Install not support this platform!")
+		logrus.Print("Install not support this platform!")
 	}
 
 }

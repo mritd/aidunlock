@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"log"
+	"github.com/sirupsen/logrus"
 
 	"errors"
 
@@ -74,7 +74,7 @@ func (appID AppleID) Unlock() error {
 
 func (appID AppleID) ValidateAppleID() (string, error) {
 
-	log.Printf("Validate AppID ==> %s\n", appID.ID)
+	logrus.Printf("Validate AppID ==> %s\n", appID.ID)
 
 	// create request
 	req, err := http.NewRequest("POST", BaseURL+"/password/verify/appleid", bytes.NewBufferString(`{"id":"`+appID.ID+`"}`))
@@ -101,7 +101,7 @@ func (appID AppleID) ValidateAppleID() (string, error) {
 	location := resp.Header.Get("Location")
 
 	if strings.HasPrefix(location, "/recovery/options") {
-		log.Println("Apple ID []")
+		logrus.Print("Apple ID []")
 	}
 
 	// get sstt and question
@@ -138,7 +138,7 @@ func (appID AppleID) ValidateAppleID() (string, error) {
 
 func (appID AppleID) SelectAuthenticationMethod(sstt string) (string, string, error) {
 
-	log.Println("Select Authentication Method")
+	logrus.Print("Select Authentication Method")
 
 	// create request
 	req, err := http.NewRequest("GET", BaseURL+"/password/authenticationmethod", nil)
@@ -199,7 +199,7 @@ func (appID AppleID) SelectAuthenticationMethod(sstt string) (string, string, er
 
 func (appID AppleID) ValidateBirthday(sstt, location string) (string, string, error) {
 
-	log.Println("Validate Birthday")
+	logrus.Print("Validate Birthday")
 
 	// get sstt
 	req, err := http.NewRequest("GET", BaseURL+location, nil)
@@ -257,7 +257,7 @@ func (appID AppleID) ValidateBirthday(sstt, location string) (string, string, er
 }
 
 func (appID AppleID) AnswerQuestion(sstt, location string) (string, string, error) {
-	log.Println("Answer Question")
+	logrus.Print("Answer Question")
 
 	// get sstt
 	req, err := http.NewRequest("GET", BaseURL+location, nil)
@@ -292,7 +292,7 @@ func (appID AppleID) AnswerQuestion(sstt, location string) (string, string, erro
 	questions := Questions{}
 
 	for i := 0; i < any.Size(); i++ {
-		log.Printf("Question [%d]: %s\n", i+1, any.Get(i, "question").ToString())
+		logrus.Printf("Question [%d]: %s\n", i+1, any.Get(i, "question").ToString())
 		q := Question{
 			ID:       any.Get(i, "id").ToInt(),
 			Number:   any.Get(i, "number").ToInt(),
@@ -306,7 +306,7 @@ func (appID AppleID) AnswerQuestion(sstt, location string) (string, string, erro
 		return "", "", err
 	}
 
-	log.Printf("Answer Question JSON: %s\n", string(json))
+	logrus.Printf("Answer Question JSON: %s\n", string(json))
 
 	// get sstt
 	req, err = http.NewRequest("POST", BaseURL+"/password/verify/questions", bytes.NewBuffer(json))
@@ -330,7 +330,7 @@ func (appID AppleID) AnswerQuestion(sstt, location string) (string, string, erro
 		if !CheckErr(err) {
 			return "", "", err
 		}
-		log.Println(string(b))
+		logrus.Print(string(b))
 		return "", "", errors.New("Answer Question Failed ")
 	}
 
@@ -340,7 +340,7 @@ func (appID AppleID) AnswerQuestion(sstt, location string) (string, string, erro
 }
 
 func (appID AppleID) UnlockAppleID(sstt, location string) (string, string, error) {
-	log.Println("Unlock AppleID")
+	logrus.Print("Unlock AppleID")
 
 	// get sstt
 	req, err := http.NewRequest("GET", BaseURL+location, nil)
@@ -394,7 +394,7 @@ func (appID AppleID) UnlockAppleID(sstt, location string) (string, string, error
 }
 
 func (appID AppleID) RestPassword(sstt, location string) error {
-	log.Println("Reset AppleID Password")
+	logrus.Print("Reset AppleID Password")
 
 	// get sstt
 	req, err := http.NewRequest("GET", BaseURL+location, nil)
@@ -422,7 +422,7 @@ func (appID AppleID) RestPassword(sstt, location string) error {
 	password := RandStr(16)
 	appID.Password = password
 
-	log.Printf("Reset Password: %s\n", password)
+	logrus.Printf("Reset Password: %s\n", password)
 
 	// unlock
 	req, err = http.NewRequest("POST", BaseURL+"/password/reset", bytes.NewBufferString(`{"password":"`+password+`"}`))
@@ -456,13 +456,13 @@ func (appID AppleID) RestPassword(sstt, location string) error {
 		return err
 	}
 	if jsoniter.Get(b, "unlockCompleted").ToBool() {
-		log.Printf("Unlock Apple ID [%s] success\n", appID.ID)
+		logrus.Printf("Unlock Apple ID [%s] success\n", appID.ID)
 	}
 	return nil
 }
 
 func (appID AppleID) ValidatePassword(sstt, location string) error {
-	log.Println("Validate Password")
+	logrus.Print("Validate Password")
 
 	// get sstt
 	req, err := http.NewRequest("GET", BaseURL+location, nil)
@@ -519,7 +519,7 @@ func (appID AppleID) ValidatePassword(sstt, location string) error {
 		return err
 	}
 	if jsoniter.Get(b, "unlockCompleted").ToBool() {
-		log.Printf("Unlock Apple ID [%s] success\n", appID.ID)
+		logrus.Printf("Unlock Apple ID [%s] success\n", appID.ID)
 	}
 	return nil
 }

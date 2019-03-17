@@ -5,7 +5,7 @@ COMMIT_SHA1     := $(shell git rev-parse HEAD)
 all:
 	gox -osarch="darwin/amd64 linux/386 linux/amd64 windows/amd64" \
         -output="dist/{{.Dir}}_{{.OS}}_{{.Arch}}" \
-    	-ldflags   "-w -s"
+    	-ldflags   "-w -s -X 'github.com/mritd/aidunlock/cmd.Version=${BUILD_VERSION}'"
 
 release: all
 	ghr -u mritd -t $(GITHUB_RELEASE_TOKEN) -replace -recreate --debug ${BUILD_VERSION} dist
